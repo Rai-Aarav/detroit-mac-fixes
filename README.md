@@ -16,8 +16,12 @@ bytes, refuse to run on a different game version, and keep a backup.
 - The fork's one-byte background-blur exe patch.
 - Bottle env: `MVK_CONFIG_SHADER_COMPRESSION_ALGORITHM=3`, `MVK_CONFIG_SHOULD_MAXIMIZE_CONCURRENT_COMPILATION=1`.
 - First launch with no `ShaderCache`, which takes about 30 minutes of in-game "Shader pipelines cache creation".
-  Then `Scripts/compile_msl_library_cache.sh` (needs Apple's Metal Toolchain:
-  `xcodebuild -downloadComponent MetalToolchain`).
+  Then `Scripts/compile_msl_library_cache.sh` (needs Apple's Metal Toolchain).
+- For full install steps, use the existing guides rather than this page. PMN123's
+  [CrossOver setup notes](https://github.com/DiAvisoo/MoltenVK-Detroit/pull/2) cover Xcode first launch, the Metal
+  Toolchain, the depth-of-field reset, and later-scene shaders. xxMAKMAKxx's
+  [Sikarugir step-by-step guide](https://github.com/KhronosGroup/MoltenVK/issues/2054#issuecomment-5253077239)
+  covers Sikarugir. This page only adds what those don't cover.
 
 ## Problems we hit, and what fixed them
 
@@ -33,6 +37,7 @@ for f in msl-v1-d*; do mv -n "$f" "msl-v1-d0000000000000000-${f#msl-v1-d????????
 ```
 
 ### 2. Game closes by itself ~30 s after relaunch (with an existing ShaderCache)
+Matches the "shows GPU not supported, then nothing happens" reports from MichaelScherf and AppleUser560 in #2054.
 On every launch Detroit shows "Your graphics card is not officially supported..." (and sometimes a driver
 warning). In our tests every relaunch that used an existing ShaderCache shut down cleanly about 30 s after that
 dialog. MoltenVK reported no errors and the swapchains were created fine. With the dialogs auto-answered as OK,
@@ -58,6 +63,11 @@ through the scene. Where the bad coordinates come from is still open.
   being tested, so this is reported as a bug only. The game's PlayStation support only knows DualShock 4 IDs,
   so a DualSense always gets Xbox button prompts.
 - Root cause of the bad rectangle coordinates in (3).
+
+## Credits
+DiAvisoo (MoltenVK-Detroit), alexdremov (MoltenVK and SPIRV-Cross work, including SPIRV-Cross#2639), PMN123 and
+xxMAKMAKxx (setup guides), meste7 (graphics-settings finding), shreyas-dsgn, ShaddoSwe and ZerO970 (reboot reports
+in MoltenVK-Detroit#1), MichaelScherf and AppleUser560 (relaunch reports), and everyone in #2054.
 
 ## Gotchas for anyone debugging this
 - The fork's release build compiles its diagnostics out. Reverting commit `3ea0f04` brings back
